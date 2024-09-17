@@ -1,19 +1,20 @@
-// src/controllers/download.controller.js
 import DownloadModel from "../models/download.model.js";
 import { createDownloadValidator, updateDownloadValidator } from "../validators/download.dto.js";
 
 // Create a new download
 const createDownload = async (req, res) => {
     try {
-        // Validate request data
         const { error } = createDownloadValidator.validate(req.body);
         if (error) {
             return res.status(400).json({ error: error.details[0].message });
         }
+        if (!req.file) {
+            return res.status(400).json({ error: 'Attachment is required' });
+        }
 
         const newDownload = new DownloadModel({
             documentName: req.body.documentName,
-            attachment: req.file ? req.file.path : null, // Save the file path
+            attachment: req.file.path, 
         });
 
         await newDownload.save();
@@ -49,7 +50,6 @@ const getDownloadById = async (req, res) => {
 // Update an existing download
 const updateDownload = async (req, res) => {
     try {
-        // Validate request data
         const { error } = updateDownloadValidator.validate(req.body);
         if (error) {
             return res.status(400).json({ error: error.details[0].message });
@@ -59,7 +59,7 @@ const updateDownload = async (req, res) => {
             req.params.id,
             {
                 documentName: req.body.documentName,
-                attachment: req.file ? req.file.path : req.body.attachment, // Preserve existing file if not updating
+                attachment: req.file ? req.file.path : req.body.attachment,
             },
             { new: true, runValidators: true }
         );

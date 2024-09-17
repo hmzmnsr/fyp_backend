@@ -4,30 +4,26 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Get the __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-const envFile = `.env.${process.env.NODE_ENV || 'local'}`; // Fallback to 'local' if NODE_ENV is not set
+const envFile = `.env.${process.env.NODE_ENV || 'local'}`;
 dotenv.config({ path: path.join(__dirname, envFile) });
 
 console.log("Environment variables loaded");
 
-// Import routes and database connection function
 import { defineRoutes } from "./src/routes/index.js";
-import { connectToMongoDB } from "./src/utils/db.js";  // Add .js extension in ES modules
+import { connectToMongoDB } from "./src/utils/db.js"; 
 
 const app = express();
 const port = process.env.PORT || 8001;
 
-app.use(express.json()); // For parsing JSON request bodies
+app.use(express.json());
 app.use(cors());
 
-// Define application routes
 defineRoutes(app);
 
 app.listen(port, () => {
   console.info(`Server is running at http://localhost:${port}`);
-  connectToMongoDB(); // Connect to the database
+  connectToMongoDB();
 });

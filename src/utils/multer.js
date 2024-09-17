@@ -1,19 +1,25 @@
 import multer from 'multer';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';
 
-// Define storage location and filename
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Use the 'uploads' directory directly in the project root
-        cb(null, path.join(__dirname, '../uploads/')); // '../uploads/' resolves to the 'uploads' folder at the project root
+        const uploadPath = join(__dirname, '../uploads/');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
+        cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        // Append timestamp to the filename to avoid name clashes
         cb(null, `${Date.now()}_${file.originalname}`);
     }
 });
 
-// Create multer instance with storage configuration
 const upload = multer({ storage });
 
 export default upload;
