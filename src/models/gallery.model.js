@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import AlbumSchema from '../schemas/album.schema.js';
+import AlbumSchema from "../schemas/gallery.schema.js";
 
 const AlbumModel = mongoose.model('Album', AlbumSchema);
 

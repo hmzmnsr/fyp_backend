@@ -1,5 +1,5 @@
-import AlbumModel from '../models/album.model.js';
-import { albumSchemaValidator, createAlbumValidator, updateAlbumValidator } from '../validators/album.dto.js';
+import AlbumModel from "../models/gallery.model.js";
+import { albumSchemaValidator, createAlbumValidator, updateAlbumValidator } from "../validators/gallery.dto.js";
 
 // Get all albums
 export const getAllAlbums = async (req, res) => {

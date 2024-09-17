@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { getAllAlbums, createAlbum, updateAlbum, deleteAlbum } from '../controllers/album.controller.js';
+import { getAllAlbums, createAlbum, updateAlbum, deleteAlbum } from "../controllers/gallery.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 // Configure multer storage
