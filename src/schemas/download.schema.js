@@ -7,11 +7,11 @@ const downloadSchema = new mongoose.Schema({
         trim: true,
     },
     attachment: {
-        type: String, // This can store a URL, file path, or other metadata reference
+        type: String,
         required: true,
     },
 }, {
-    timestamps: true, // Adds createdAt and updatedAt fields automatically
+    timestamps: true, 
 });
 
 export default downloadSchema;
