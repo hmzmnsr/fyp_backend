@@ -1,5 +1,7 @@
 import AlbumModel from "../models/gallery.model.js";
-import { albumSchemaValidator, createAlbumValidator, updateAlbumValidator } from "../validators/gallery.dto.js";
+import path from 'path';
+import fs from 'fs';
+import { createAlbumValidator, updateAlbumValidator } from "../validators/gallery.dto.js";
 
 // Get all albums
 export const getAllAlbums = async (req, res) => {
@@ -11,35 +13,45 @@ export const getAllAlbums = async (req, res) => {
     }
 };
 
-// Validate the full schema
-export const validateSchema = (req, res) => {
-    const { error } = albumSchemaValidator.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
-    res.status(200).json({ message: 'Schema validation successful!' });
-};
-
-// Create a new album
-// Create a new album
 export const createAlbum = async (req, res) => {
     const { error } = createAlbumValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.file ? req.file.path : ''; // Assuming `coverPhoto` is uploaded with `multer`
-    const images = req.files.images ? req.files.images.map(file => file.path) : []; // Assuming multiple files for images
+
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].path : '';
+    const images = req.files && req.files.images ? req.files.images.map(file => file.path) : [];
 
     try {
+        if (!coverPhoto) {
+            return res.status(400).json({ error: 'Cover photo is required' });
+        }
+
         const newAlbum = new AlbumModel({
             name,
             coverPhoto,
             images,
         });
         await newAlbum.save();
-        res.status(201).json(newAlbum);
+        res.status(201).json({
+            message: 'Album created successfully',
+            album: newAlbum,
+        });
     } catch (error) {
+        console.error('Error creating album:', error);
         res.status(500).json({ error: 'Failed to create album' });
+    }
+};
+
+// Helper function to remove files
+const removeFile = async (filePath) => {
+    if (filePath) {
+        try {
+            const fullPath = path.join(__dirname, '../uploads/', filePath);
+            await fs.promises.unlink(fullPath);
+        } catch (err) {
+            console.error(`Failed to delete file: ${filePath}`, err);
+        }
     }
 };
 
@@ -49,19 +61,43 @@ export const updateAlbum = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.file ? req.file.path : ''; // Update cover photo if a new file is uploaded
-    const images = req.files.images ? req.files.images.map(file => file.path) : []; // Update images if new files are uploaded
+
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].path : '';
+    const images = req.files && req.files.images ? req.files.images.map(file => file.path) : [];
 
     try {
+        const album = await AlbumModel.findById(req.params.id);
+        if (!album) return res.status(404).json({ error: 'Album not found' });
+
+        if (coverPhoto && album.coverPhoto) {
+            await removeFile(album.coverPhoto);
+        }
+
+        if (images.length > 0 && album.images.length > 0) {
+            await Promise.all(album.images.map(image => removeFile(image)));
+        }
+
         const updatedAlbum = await AlbumModel.findByIdAndUpdate(
             req.params.id,
-            { name, coverPhoto, images },
+            {
+                name: name || album.name,
+                coverPhoto: coverPhoto || album.coverPhoto,
+                images: images.length > 0 ? images : album.images,
+            },
             { new: true }
         );
-        if (!updatedAlbum) return res.status(404).json({ error: 'Album not found' });
-        res.status(200).json(updatedAlbum);
+
+        res.status(200).json({
+            message: 'Album updated successfully',
+            album: {
+                name: updatedAlbum.name,
+                coverPhoto: updatedAlbum.coverPhoto,
+                images: updatedAlbum.images,
+            },
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update album' });
+        console.error('Error during album update:', error);
+        res.status(500).json({ error: 'Failed to update album due to server error' });
     }
 };
 
@@ -70,6 +106,14 @@ export const deleteAlbum = async (req, res) => {
     try {
         const deletedAlbum = await AlbumModel.findByIdAndDelete(req.params.id);
         if (!deletedAlbum) return res.status(404).json({ error: 'Album not found' });
+    
+        if (deletedAlbum.coverPhoto) {
+            await removeFile(deletedAlbum.coverPhoto);
+        }
+        if (deletedAlbum.images.length > 0) {
+            await Promise.all(deletedAlbum.images.map(image => removeFile(image)));
+        }
+
         res.status(200).json({ message: 'Album deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete album' });

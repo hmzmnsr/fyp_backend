@@ -12,7 +12,6 @@ const storage = multer.diskStorage({
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
-
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
@@ -20,6 +19,9 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage });
+const upload = multer({
+    storage,
+    limits: { fileSize: 1024 * 1024 * 100 } // 100MB file size limit
+});
 
 export default upload;
