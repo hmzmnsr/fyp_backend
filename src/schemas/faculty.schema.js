@@ -7,7 +7,11 @@ const FacultySchema = new Schema({
     department: { type: String, required: true, trim: true },
     qualification: { type: String, required: true, trim: true },
     image: { type: String, required: true, trim: true },
-    position: { type: String, enum: ['Dean', 'HOD', 'Faculty'], default: 'Faculty' },
+    position: { 
+        type: String, 
+        enum: ['Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge'], 
+        default: 'Lecturer' 
+    },
 }, {
     timestamps: true,
 });

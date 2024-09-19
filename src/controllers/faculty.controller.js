@@ -24,6 +24,8 @@ export const validateSchema = (req, res) => {
 export const createFaculty = async (req, res) => {
     const { error } = createFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
+
+    // Image is now handled by Multer, so get the image path from req.file
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
@@ -39,6 +41,8 @@ export const createFaculty = async (req, res) => {
 export const updateFaculty = async (req, res) => {
     const { error } = updateFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
+
+    // Handle the image path if a new image is uploaded
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
