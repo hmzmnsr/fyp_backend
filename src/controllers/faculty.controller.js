@@ -24,7 +24,7 @@ export const validateSchema = (req, res) => {
 export const createFaculty = async (req, res) => {
     const { error } = createFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
-    
+
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     try {
@@ -38,6 +38,7 @@ export const createFaculty = async (req, res) => {
 
 // Update a faculty member
 export const updateFaculty = async (req, res) => {
+    console.log('Update Faculty Request Body:', req.body);
     const { error } = updateFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
@@ -59,10 +60,12 @@ export const updateFaculty = async (req, res) => {
 // Delete a faculty member
 export const deleteFaculty = async (req, res) => {
     try {
-        const deletedFaculty = await FacultyModel.findByIdAndDelete(req.params.id);
-        if (!deletedFaculty) return res.status(404).json({ error: 'Faculty member not found' });
-        res.status(200).json({ message: 'Faculty member deleted successfully' });
+      const deletedFaculty = await FacultyModel.findByIdAndDelete(req.params.id);
+      if (!deletedFaculty) {
+        return res.status(404).json({ error: 'Faculty member not found' });
+      }
+      res.status(200).json({ id: deletedFaculty._id, message: 'Faculty member deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete faculty member' });
+      res.status(500).json({ error: 'Failed to delete faculty member' });
     }
-};
+  };

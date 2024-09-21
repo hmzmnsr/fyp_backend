@@ -11,6 +11,9 @@ const FacultySchema = new Schema({
         enum: ['Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge'], 
         default: 'Lecturer' 
     },
+    areaOfInterest: { type: String, trim: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
+    about: { type: String, trim: true },
 }, {
     timestamps: true,
 });
