@@ -22,6 +22,7 @@ export const validateSchema = (req, res) => {
 
 // Create a new faculty member
 export const createAlumni = async (req, res) => {
+    console.log(req.body);
     const { error } = createAlumniValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
     try {

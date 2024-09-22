@@ -18,4 +18,4 @@ const FacultySchema = new Schema({
     timestamps: true,
 });
 
-export default FacultySchema;
+export default FacultySchema; 
