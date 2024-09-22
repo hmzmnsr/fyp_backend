@@ -1,17 +1,22 @@
-import path from 'path'; // Import path module to handle file paths
-import fs from 'fs'; // Import fs module for file system operations
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
 import FacultyModel from '../models/faculty.model.js';
 import { facultySchemaValidator, createFacultyValidator, updateFacultyValidator } from '../validators/faculty.dto.js';
 
-// Helper function to remove a file
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const removeFile = async (fileName) => {
-    const filePath = path.join(__dirname, '../uploads/', fileName); // Define the full path to the file
+    const filePath = path.join(__dirname, '../uploads/', fileName);
     try {
         if (fs.existsSync(filePath)) {
-            await fs.promises.unlink(filePath); // Remove the file
+            await fs.promises.unlink(filePath);
         }
     } catch (err) {
-        console.error(`Failed to delete file: ${fileName}`, err);
+        console.error(`Error occurred while deleting file: ${fileName}`, err);
+        throw new Error('File deletion error');
     }
 };
 
@@ -39,7 +44,7 @@ export const createFaculty = async (req, res) => {
     const { error } = createFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
-    const imageFileName = req.file ? req.file.filename : null; // Store only the file name
+    const imageFileName = req.file ? req.file.filename : null;
 
     try {
         const newFaculty = new FacultyModel({ ...req.body, image: imageFileName });
@@ -52,7 +57,6 @@ export const createFaculty = async (req, res) => {
 
 // Update a faculty member
 export const updateFaculty = async (req, res) => {
-    console.log('Update Faculty Request Body:', req.body);
     const { error } = updateFacultyValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
@@ -60,20 +64,26 @@ export const updateFaculty = async (req, res) => {
         const faculty = await FacultyModel.findById(req.params.id);
         if (!faculty) return res.status(404).json({ error: 'Faculty member not found' });
 
-        const newImageFileName = req.file ? req.file.filename : faculty.image; // If new image uploaded, use its file name
+        const newImageFileName = req.file ? req.file.filename : faculty.image;
+        
         if (req.file && faculty.image) {
-            // If a new image is uploaded, remove the old one
-            await removeFile(faculty.image);
+            try {
+                await removeFile(faculty.image);
+            } catch (err) {
+                console.error('Failed to remove the previous image file:', err);
+                return res.status(500).json({ error: 'Failed to delete the associated image file' });
+            }
         }
 
         const updatedFaculty = await FacultyModel.findByIdAndUpdate(
             req.params.id,
-            { ...req.body, image: newImageFileName }, // Update with the new file name (or keep the old one)
+            { ...req.body, image: newImageFileName },
             { new: true }
         );
 
         res.status(200).json(updatedFaculty);
     } catch (error) {
+        console.error('Error updating faculty:', error);
         res.status(500).json({ error: 'Failed to update faculty member' });
     }
 };
@@ -86,7 +96,6 @@ export const deleteFaculty = async (req, res) => {
             return res.status(404).json({ error: 'Faculty member not found' });
         }
 
-        // Remove the associated image file if it exists
         if (deletedFaculty.image) {
             await removeFile(deletedFaculty.image);
         }

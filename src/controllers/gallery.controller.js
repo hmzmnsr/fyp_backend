@@ -4,11 +4,9 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createAlbumValidator, updateAlbumValidator } from "../validators/gallery.dto.js";
 
-// Calculate __dirname using import.meta.url
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Helper function to remove files
 const removeFile = async (filePath) => {
     if (filePath) {
         const fullPath = path.join(__dirname, '../uploads/', filePath);
@@ -39,8 +37,8 @@ export const createAlbum = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : ''; // Use filename instead of path
-    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : []; // Use filename instead of path
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : '';
+    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : [];
 
     try {
         if (!coverPhoto) {
@@ -70,22 +68,19 @@ export const updateAlbum = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : ''; // Use filename instead of path
-    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : []; // Use filename instead of path
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : '';
+    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : [];
 
     try {
         const album = await AlbumModel.findById(req.params.id);
         if (!album) return res.status(404).json({ error: 'Album not found' });
 
-        // Remove old cover photo if a new one is uploaded
         if (coverPhoto && album.coverPhoto) {
             await removeFile(album.coverPhoto);
         }
 
-        // If new images are uploaded, append them to the existing ones
         const updatedImages = images.length > 0 ? [...album.images, ...images] : album.images;
 
-        // Update the album with new or existing data
         const updatedAlbum = await AlbumModel.findByIdAndUpdate(
             req.params.id,
             {
@@ -116,7 +111,6 @@ export const deleteAlbum = async (req, res) => {
         const deletedAlbum = await AlbumModel.findByIdAndDelete(req.params.id);
         if (!deletedAlbum) return res.status(404).json({ error: 'Album not found' });
 
-        // Remove the cover photo and images from the file system
         if (deletedAlbum.coverPhoto) {
             await removeFile(deletedAlbum.coverPhoto);
         }
