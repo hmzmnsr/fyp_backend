@@ -1,3 +1,4 @@
+import path from 'path'; // Import path module to handle file paths
 import DownloadModel from "../models/download.model.js";
 import { createDownloadValidator, updateDownloadValidator } from "../validators/download.dto.js";
 
@@ -12,9 +13,10 @@ const createDownload = async (req, res) => {
             return res.status(400).json({ error: 'Attachment is required' });
         }
 
+        // Save only the file name (not the full path)
         const newDownload = new DownloadModel({
             documentName: req.body.documentName,
-            attachment: req.file.path, 
+            attachment: path.basename(req.file.path), // Extract the file name only
         });
 
         await newDownload.save();
@@ -59,7 +61,7 @@ const updateDownload = async (req, res) => {
             req.params.id,
             {
                 documentName: req.body.documentName,
-                attachment: req.file ? req.file.path : req.body.attachment,
+                attachment: req.file ? path.basename(req.file.path) : req.body.attachment, // Use file name only
             },
             { new: true, runValidators: true }
         );
