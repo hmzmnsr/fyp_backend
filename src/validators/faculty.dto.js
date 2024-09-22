@@ -3,19 +3,19 @@ import Joi from 'joi';
 const facultySchemaValidator = Joi.object({
     name: Joi.string().required().trim(),
     qualification: Joi.string().required().trim(),
-    position: Joi.string().valid('Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge').default('Lecturer'),
-    areaOfInterest: Joi.string().optional().trim(),
+    position: Joi.string().required().valid('Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge').default('Lecturer'),
+    areaOfInterest: Joi.string().required().trim(),
     email: Joi.string().required().trim().email(),
-    about: Joi.string().optional().trim(),
+    about: Joi.string().required().trim(),
 });
 
 const createFacultyValidator = Joi.object({
     name: Joi.string().required().trim(),
     qualification: Joi.string().required().trim(),
-    position: Joi.string().optional().valid('Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge').default('Lecturer'),
-    areaOfInterest: Joi.string().optional().trim(),
+    position: Joi.string().required().valid('Dean', 'HOD', 'Professor', 'Assistant Professor', 'Lecturer', 'Incharge').default('Lecturer'),
+    areaOfInterest: Joi.string().required().trim(),
     email: Joi.string().required().trim().email(),
-    about: Joi.string().optional().trim(),
+    about: Joi.string().required().trim(),
 });
 
 const updateFacultyValidator = Joi.object({

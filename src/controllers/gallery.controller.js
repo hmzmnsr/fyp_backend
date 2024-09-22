@@ -39,8 +39,8 @@ export const createAlbum = async (req, res) => {
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].path : '';
-    const images = req.files && req.files.images ? req.files.images.map(file => file.path) : [];
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : ''; // Use filename instead of path
+    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : []; // Use filename instead of path
 
     try {
         if (!coverPhoto) {
@@ -64,14 +64,14 @@ export const createAlbum = async (req, res) => {
     }
 };
 
-// Update an album (name, coverPhoto, and/or images can be appended/updated)
+// Update an album
 export const updateAlbum = async (req, res) => {
     const { error } = updateAlbumValidator.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const { name } = req.body;
-    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].path : '';
-    const images = req.files && req.files.images ? req.files.images.map(file => file.path) : [];
+    const coverPhoto = req.files && req.files.coverPhoto ? req.files.coverPhoto[0].filename : ''; // Use filename instead of path
+    const images = req.files && req.files.images ? req.files.images.map(file => file.filename) : []; // Use filename instead of path
 
     try {
         const album = await AlbumModel.findById(req.params.id);
@@ -110,7 +110,7 @@ export const updateAlbum = async (req, res) => {
     }
 };
 
-// Delete an album (entire document and associated files)
+// Delete an album
 export const deleteAlbum = async (req, res) => {
     try {
         const deletedAlbum = await AlbumModel.findByIdAndDelete(req.params.id);

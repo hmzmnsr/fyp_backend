@@ -1,6 +1,19 @@
 import path from 'path'; // Import path module to handle file paths
+import fs from 'fs'; // Import fs module for file system operations
 import DownloadModel from "../models/download.model.js";
 import { createDownloadValidator, updateDownloadValidator } from "../validators/download.dto.js";
+
+// Helper function to remove a file
+const removeFile = async (filePath) => {
+    const fullPath = path.join(__dirname, '../uploads/', filePath); // Define the full path to the file
+    try {
+        if (fs.existsSync(fullPath)) {
+            await fs.promises.unlink(fullPath); // Remove the file
+        }
+    } catch (err) {
+        console.error(`Failed to delete file: ${filePath}`, err);
+    }
+};
 
 // Create a new download
 const createDownload = async (req, res) => {
@@ -13,10 +26,12 @@ const createDownload = async (req, res) => {
             return res.status(400).json({ error: 'Attachment is required' });
         }
 
-        // Save only the file name (not the full path)
+        const fileName = path.basename(req.file.filename); // Get the filename without the path
+        const cleanFileName = fileName.replace(/^\d+_/, ''); // Remove leading numbers and underscore
+
         const newDownload = new DownloadModel({
             documentName: req.body.documentName,
-            attachment: path.basename(req.file.path), // Extract the file name only
+            attachment: cleanFileName, // Store the cleaned file name
         });
 
         await newDownload.save();
@@ -57,18 +72,27 @@ const updateDownload = async (req, res) => {
             return res.status(400).json({ error: error.details[0].message });
         }
 
+        const download = await DownloadModel.findById(req.params.id);
+        if (!download) {
+            return res.status(404).json({ message: 'Download not found' });
+        }
+
+        const fileName = req.file ? path.basename(req.file.filename) : download.attachment;
+        const cleanFileName = fileName.replace(/^\d+_/, ''); // Clean the file name again if necessary
+
+        // Remove the old file if a new file is uploaded
+        if (req.file && download.attachment) {
+            await removeFile(download.attachment);
+        }
+
         const updatedDownload = await DownloadModel.findByIdAndUpdate(
             req.params.id,
             {
                 documentName: req.body.documentName,
-                attachment: req.file ? path.basename(req.file.path) : req.body.attachment, // Use file name only
+                attachment: cleanFileName, // Store the cleaned file name
             },
             { new: true, runValidators: true }
         );
-
-        if (!updatedDownload) {
-            return res.status(404).json({ message: 'Download not found' });
-        }
 
         res.status(200).json({ message: 'Download updated successfully', data: updatedDownload });
     } catch (error) {
@@ -83,6 +107,11 @@ const deleteDownload = async (req, res) => {
 
         if (!deletedDownload) {
             return res.status(404).json({ message: 'Download not found' });
+        }
+
+        // Remove the attachment file associated with the deleted download
+        if (deletedDownload.attachment) {
+            await removeFile(deletedDownload.attachment);
         }
 
         res.status(200).json({ message: 'Download deleted successfully' });

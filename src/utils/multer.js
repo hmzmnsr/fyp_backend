@@ -15,7 +15,10 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        cb(null, `${Date.now()}_${file.originalname}`);
+        const originalName = file.originalname.split('.'); // Split by dot to get the extension
+        const extension = originalName.pop(); // Get the extension
+        const fileName = originalName.join('.'); // Join back the original name without the extension
+        cb(null, `${fileName}.${extension}`); // Save without numeric prefix
     }
 });
 
