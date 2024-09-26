@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-const BSCSSchema = new Schema({
+const MSCSSchema = new Schema({
     term: { type: String, required: true, trim: true },
     year: { type: Number, required: true, trim: true },
     semester: { type: Number, required: true },
@@ -17,4 +17,4 @@ const BSCSSchema = new Schema({
     timestamps: true,
 });
 
-export default BSCSSchema; 
+export default MSCSSchema;
