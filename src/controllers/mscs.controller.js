@@ -1,5 +1,5 @@
 import MSCSModel from '../models/mscs.model.js';
-import { createMSCSValidator, updateMSCSValidator } from "../validators/mscs.dto.js";
+import { createMSCSValidator, updateMSCSValidator } from "../validators/mscs.dto.js"; 
 
 export const createMSCS = async (req, res) => {
     const { error } = createMSCSValidator.validate(req.body);

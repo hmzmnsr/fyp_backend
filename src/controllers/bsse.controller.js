@@ -1,4 +1,4 @@
-import BSSEModel from '../models/bscs.model.js';
+import BSSEModel from '../models/bsse.model.js';
 import { createBSSEValidator, updateBSSEValidator } from "../validators/bsse.dto.js";
 
 export const createBSSE = async (req, res) => {
@@ -106,3 +106,4 @@ export const deleteCourseInBSSE = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+ 
