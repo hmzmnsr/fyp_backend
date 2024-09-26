@@ -59,7 +59,6 @@ export const deleteBSSE = async (req, res) => {
 
 
 export const updateCourseInBSSE = async (req, res) => {
-    console.log(req.body);
     const { courseId } = req.params;
     const { courseCode, subjectName, creditHours } = req.body;
 
