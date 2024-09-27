@@ -58,7 +58,6 @@ export const deleteADPCS = async (req, res) => {
 
 
 export const updateCourseInADPCS = async (req, res) => {
-    console.log(req.body);
 
     const { courseId } = req.params;
 

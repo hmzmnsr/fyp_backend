@@ -60,6 +60,7 @@ export const deleteBSSE = async (req, res) => {
 
 export const updateCourseInBSSE = async (req, res) => {
     const { courseId } = req.params;
+
     const { courseCode, subjectName, creditHours } = req.body;
 
     if (!courseCode || !subjectName || !creditHours) {
@@ -67,7 +68,7 @@ export const updateCourseInBSSE = async (req, res) => {
     }
 
     try {
-        const bsse = await BSSEModel.findByIdAndUpdate(
+        const bscs = await BSSEModel.findByIdAndUpdate(
             req.params.id,
             { $set: { "courses.$[elem]": { courseCode, subjectName, creditHours } } },
             {
@@ -77,13 +78,14 @@ export const updateCourseInBSSE = async (req, res) => {
             }
         );
 
-        if (!bsse) return res.status(404).json({ message: 'BSSE roadmap not found' });
+        if (!bscs) return res.status(404).json({ message: 'BSSE roadmap not found' });
 
-        res.status(200).json(bsse);
+        res.status(200).json(bscs);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 export const deleteCourseInBSSE = async (req, res) => {
     const { courseId } = req.params;

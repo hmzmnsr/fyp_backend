@@ -62,8 +62,6 @@ export const deleteBSCS = async (req, res) => {
 
 
 export const updateCourseInBSCS = async (req, res) => {
-    console.log(req.body);
-
     const { courseId } = req.params;
 
     const { courseCode, subjectName, creditHours } = req.body;

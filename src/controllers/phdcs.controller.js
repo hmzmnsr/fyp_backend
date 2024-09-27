@@ -58,7 +58,6 @@ export const deletePHDCS = async (req, res) => {
 
 
 export const updateCourseInPHDCS = async (req, res) => {
-    console.log(req.body);
 
     const { courseId } = req.params;
     const { courseCode, subjectName, creditHours } = req.body;
