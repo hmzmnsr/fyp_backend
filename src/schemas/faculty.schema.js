@@ -14,6 +14,7 @@ const FacultySchema = new Schema({
     areaOfInterest: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
     about: { type: String, required: true, trim: true },
+    status: {type: String, required: true, trim: true },
 }, {
     timestamps: true,
 });

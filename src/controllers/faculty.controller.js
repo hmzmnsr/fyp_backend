@@ -104,4 +104,4 @@ export const deleteFaculty = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete faculty member' });
     }
-};
+}; 

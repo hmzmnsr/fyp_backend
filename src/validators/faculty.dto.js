@@ -7,6 +7,7 @@ const facultySchemaValidator = Joi.object({
     areaOfInterest: Joi.string().required().trim(),
     email: Joi.string().required().trim().email(),
     about: Joi.string().required().trim(),
+    status: Joi.string().required().trim()
 });
 
 const createFacultyValidator = Joi.object({
@@ -16,6 +17,7 @@ const createFacultyValidator = Joi.object({
     areaOfInterest: Joi.string().required().trim(),
     email: Joi.string().required().trim().email(),
     about: Joi.string().required().trim(),
+    status: Joi.string().required().trim()
 });
 
 const updateFacultyValidator = Joi.object({
@@ -25,6 +27,7 @@ const updateFacultyValidator = Joi.object({
     areaOfInterest: Joi.string().optional().trim(),
     email: Joi.string().optional().trim().email(),
     about: Joi.string().optional().trim(),
+    status: Joi.string().optional().trim()
 }).options({ allowUnknown: true });
 
 export {

@@ -11,3 +11,4 @@ router.put('/:id', authMiddleware, upload.single('image'), updateFaculty);
 router.delete('/:id', authMiddleware, deleteFaculty);
 
 export { router as facultyRouter }; 
+ 
